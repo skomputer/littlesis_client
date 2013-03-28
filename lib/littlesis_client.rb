@@ -4,7 +4,6 @@ require 'active_support/inflector'
 require 'faraday'
 require 'faraday_middleware'
 require 'logger'
-require 'pry'
 
 class LittlesisClient
   attr_reader :conn, :last_request, :last_response
