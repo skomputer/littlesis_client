@@ -4,6 +4,7 @@ require 'active_support/inflector'
 require 'faraday'
 require 'faraday_middleware'
 require 'logger'
+require 'pry'
 
 class LittlesisClient
   attr_reader :conn, :last_request, :last_response
@@ -47,7 +48,7 @@ class LittlesisClient
   end
 
   # create accessors for models
-  %w(Entity).each do |model_name|
+  %w(Entity Relationship).each do |model_name|
     
     # method name is snake case of model name
     method_name = model_name.underscore
@@ -85,3 +86,4 @@ end
 
 require 'littlesis_client/model'
 require 'littlesis_client/entity'
+require 'littlesis_client/relationship'

@@ -71,6 +71,7 @@ describe LittlesisClient::Entity do
       
       it "should return multiple entities" do
         @entities = @client.entity.get_many(@ids, @details)
+        expect(@entities.count).to be > 0
         expect(@entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
       end
       
@@ -101,5 +102,48 @@ describe LittlesisClient::Entity do
         end
       end
     end      
+  end
+
+  describe "#get_with_relationships" do
+    context "when given a valid entity id" do
+      before(:each) do
+        @relationships = @client.entity.get_with_relationships(1).relationships
+      end
+      
+      it "should return multiple relationships" do
+        expect(@relationships.count).to be > 0
+        expect(@relationships.collect { |r| r.class.name }.uniq).to eq(["LittlesisClient::Relationship"])
+      end
+      
+      it "should return multiple valid relationships" do
+        expect(@relationships.collect { |r| r.valid? }.uniq).to eq([true])      
+      end      
+    end
+  
+    it_behaves_like "a model method", :entity, :get_with_relationships
+  end
+  
+  describe "#get_with_related_entities" do
+    context "when given a valid entity id" do
+      before(:each) do
+        @entities = @client.entity.get_with_related_entities(1).related_entities
+      end
+      
+      it "should return multiple entities" do
+        expect(@entities.count).to be > 0
+        expect(@entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
+      end
+      
+      it "should return multiple valid entities" do
+        expect(@entities.collect { |e| e.valid? }.uniq).to eq([true])      
+      end
+      
+      it "should return the connecting relationships for each entity" do
+        expect(@entities.collect { |e| e.relationships.count }.uniq).not_to include(0)
+        expect(@entities.collect { |e| e.relationships.collect { |r| r.class.name } }.flatten.uniq).to eq(["LittlesisClient::Relationship"])
+      end      
+    end
+  
+    it_behaves_like "a model method", :entity, :get_with_related_entities  
   end
 end

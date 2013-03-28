@@ -44,8 +44,8 @@ class LittlesisClient::Model
     new(get_hash(id, path))
   end
 
-  def self.get_hash(id, path=nil)
-    response = client.get(url(id, path))
+  def self.get_hash(id, path=nil, params={})
+    response = client.get(url(id, path), params)
     response.body["Response"]["Data"][model_name]
   end
 
@@ -66,5 +66,11 @@ class LittlesisClient::Model
     else
       obj
     end
-  end    
+  end
+
+  def make_array(array)
+    array = [ array ] unless array.is_a? Array
+    array.collect! { |i| yield i } if block_given?
+    array
+  end
 end
