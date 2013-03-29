@@ -68,7 +68,7 @@ class LittlesisClient::Model
     end
   end
 
-  def make_array(array)
+  def self.make_array(array)
     array = [ array ] unless array.is_a? Array
     array.collect! { |i| yield i } if block_given?
     array

@@ -36,7 +36,9 @@ class LittlesisClient::Entity < LittlesisClient::Model
     response = client.get(url(id, "/relationships"), options).body["Response"]["Data"]
     entity = new(response["Entity"])
     rels = response["Relationships"]["Relationship"]
-    entity.relationships = rels.collect { |data| LittlesisClient::Relationship.new(data) } unless rels.nil?
+    entity.relationships = make_array(rels) do |data| 
+      LittlesisClient::Relationship.new(data)
+    end unless rels.nil?
     entity  
   end
   
@@ -45,7 +47,7 @@ class LittlesisClient::Entity < LittlesisClient::Model
     response = client.get(url(id, "/related"), options).body["Response"]["Data"]
     entity = new(response["Entity"])
     related = response["RelatedEntities"]["Entity"]
-    entity.related_entities = related.collect { |data| new(data) } unless related.nil?
+    entity.related_entities = make_array(related) { |data| new(data) } unless related.nil?
     entity
   end
   
@@ -64,9 +66,9 @@ class LittlesisClient::Entity < LittlesisClient::Model
       elsif k == "types"
         details[k.to_sym] = v.split(",")
       elsif k == "Aliases"
-        details[k.to_sym] = make_array(v["Alias"])
+        details[k.to_sym] = self.class.make_array(v["Alias"])
       elsif k == "Relationships"
-        @relationships = make_array(v["Relationship"]) { |r| LittlesisClient::Relationship.new(r) }
+        @relationships = self.class.make_array(v["Relationship"]) { |r| LittlesisClient::Relationship.new(r) }
       else
         details[k.to_sym] = self.class.symbolize_keys(v)
       end
