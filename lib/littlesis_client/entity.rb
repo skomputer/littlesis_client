@@ -42,15 +42,49 @@ class LittlesisClient::Entity < LittlesisClient::Model
     entity  
   end
   
-  # valid options keys are :category_ids, :num, :page, :is_current
-  def self.get_with_related_entities(id, options={})
+  # valid options keys are :category_ids, :num, :page, :is_current, :order
+  def self.get_related_entities(id, options={})
     response = client.get(url(id, "/related"), options).body["Response"]["Data"]
     entity = new(response["Entity"])
     related = response["RelatedEntities"]["Entity"]
-    entity.related_entities = make_array(related) { |data| new(data) } unless related.nil?
-    entity
+    return [] if related.nil?
+    make_array(related) { |data| new(data) }
   end
   
+  def self.get_related_entities_by_category(id, options={})
+    options[:sort] = "category"
+    categories = {}
+    response = client.get(url(id, "/related"), options).body["Response"]["Data"]
+    cats = response["RelationshipCategories"]["Category"]
+    return categories if cats.nil?
+    cats.each do |hash|
+      related = hash["RelatedEntities"]["Entity"]
+      categories[hash["id"].to_i] = related_entities = make_array(related) { |data| new(data) } unless related.nil?
+    end
+    categories  
+  end
+  
+  def self.get_leadership(id, options={})
+    response = client.get(url(id, "/leadership"), options).body["Response"]["Data"]
+    related = response["Leaders"]["Entity"]
+    return [] if related.nil?
+    make_array(related) { |data| new(data) }
+  end
+
+  def self.get_orgs(id, options={})
+    response = client.get(url(id, "/orgs"), options).body["Response"]["Data"]
+    related = response["Orgs"]["Entity"]
+    return [] if related.nil?
+    make_array(related) { |data| new(data) }
+  end
+  
+  def self.get_second_degree_entities(id, options={})
+    response = client.get(url(id, "/related/degree2"), options).body["Response"]["Data"]
+    related = response["Degree2Entities"]["Entity"]
+    return [] if related.nil?
+    make_array(related) { |data| new(data) }    
+  end
+      
   def initialize(data)
     @details = {}
     @relationships = []

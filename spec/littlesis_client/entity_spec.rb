@@ -19,6 +19,8 @@ describe LittlesisClient::Entity do
   end
 
   describe "#get" do
+    it_behaves_like "a model method", :entity, :get
+
     context "when given a valid entity id" do
       before(:each) do
         @entity = @client.entity.get(1)
@@ -31,12 +33,12 @@ describe LittlesisClient::Entity do
       it "should return a valid object" do
         expect(@entity.valid?).to eq(true)
       end
-    end
-    
-    it_behaves_like "a model method", :entity, :get
+    end    
   end
   
   describe "#details" do
+    it_behaves_like "a model method", :entity, :details
+
     context "when given a valid entity id" do
       before(:each) do
         @entity = @client.entity.details(1)
@@ -58,8 +60,6 @@ describe LittlesisClient::Entity do
         expect(@entity.details[:Aliases].count).to be > 0
       end      
     end
-
-    it_behaves_like "a model method", :entity, :details
   end
   
   describe "#get_many" do
@@ -71,7 +71,7 @@ describe LittlesisClient::Entity do
       
       it "should return multiple entities" do
         @entities = @client.entity.get_many(@ids, @details)
-        expect(@entities.count).to be > 0
+        expect(@entities.count).to be > 1
         expect(@entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
       end
       
@@ -105,6 +105,8 @@ describe LittlesisClient::Entity do
   end
 
   describe "#get_with_relationships" do
+    it_behaves_like "a model method", :entity, :get_with_relationships
+
     context "when given a valid entity id" do
       before(:each) do
         @id = 1
@@ -155,11 +157,11 @@ describe LittlesisClient::Entity do
         end
       end
     end
-  
-    it_behaves_like "a model method", :entity, :get_with_relationships
   end
   
-  describe "#get_with_related_entities" do
+  describe "#get_related_entities" do
+    it_behaves_like "a model method", :entity, :get_related_entities  
+
     context "when given a valid entity id" do
       before(:each) do
         @id = 1
@@ -167,18 +169,18 @@ describe LittlesisClient::Entity do
       end
       
       it "should return multiple entities" do
-        @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+        @entities = @client.entity.get_related_entities(@id, @options)
         expect(@entities.count).to be > 0
         expect(@entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
       end
       
       it "should return multiple valid entities" do
-        @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+        @entities = @client.entity.get_related_entities(@id, @options)
         expect(@entities.collect(&:valid?).uniq).to eq([true])      
       end
       
       it "should return the connecting relationships for each entity" do
-        @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+        @entities = @client.entity.get_related_entities(@id, @options)
         expect(@entities.collect { |e| e.relationships.count }.uniq).not_to include(0)
         expect(@entities.collect { |e| e.relationships.collect { |r| r.class.name } }.flatten.uniq).to eq(["LittlesisClient::Relationship"])
       end
@@ -189,7 +191,7 @@ describe LittlesisClient::Entity do
         end
 
         it "should return no more than 10 entities" do
-          @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+          @entities = @client.entity.get_related_entities(@id, @options)
           expect(@entities.count).to be <= 10        
         end
       end
@@ -200,7 +202,7 @@ describe LittlesisClient::Entity do
         end
         
         it "should only return entities connected by relationships with those category ids" do
-          @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+          @entities = @client.entity.get_related_entities(@id, @options)
           expect(@entities.collect { |e| e.relationships.map(&:category_id).map(&:to_i) }.flatten.uniq - [1, 2]).to eq([])
         end
       end
@@ -211,7 +213,7 @@ describe LittlesisClient::Entity do
         end
         
         it "should only return entities connected by relationships where the entity is first" do
-          @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+          @entities = @client.entity.get_related_entities(@id, @options)
           expect(@entities.collect { |e| e.relationships.map(&:entity1_id).map(&:to_i) }.flatten.uniq).to eq([@id])
         end
       end
@@ -222,12 +224,105 @@ describe LittlesisClient::Entity do
         end
 
         it "should only return entities connected by current relationships" do
-          @entities = @client.entity.get_with_related_entities(@id, @options).related_entities
+          @entities = @client.entity.get_related_entities(@id, @options)
           expect(@entities.collect { |e| e.relationships.map(&:is_current).map(&:to_i) }.flatten.uniq).to eq([@id])
         end
-      end
+      end      
     end
   
-    it_behaves_like "a model method", :entity, :get_with_related_entities  
+    describe "#get_related_entities_by_category" do
+      it_behaves_like "a model method", :entity, :get_related_entities_by_category  
+
+      before(:each) do
+        @id = 1
+        @options = {}
+      end
+      
+      it "should return a hash of category ids with an array of related entities connected by relationships with that category" do
+        @hash = @client.entity.get_related_entities_by_category(@id, @options)
+        expect(@hash.map do |cat, entities| 
+          entities.map do |e| 
+            e.relationships.map(&:category_id).map(&:to_i)
+          end.flatten.uniq == [cat]
+        end.uniq).to eq([true])
+      end
+    end 
+    
+    describe "#get_leadership" do
+      it_behaves_like "a model method", :entity, :get_leadership  
+      
+      before(:each) do
+        @id = 1
+        @options = {}
+      end
+      
+      it "should return an array of entities with Person as their primary type" do
+        @entities = @client.entity.get_leadership(@id, @options)
+        expect(@entities.collect.map(&:primary_type).uniq).to eq(["Person"])
+      end
+
+      pending "should return an array of entities connected by board or executive relationships" do
+        @entities = @client.entity.get_leadership(@id, @options)
+      end
+    end
+
+    describe "#get_orgs" do
+      it_behaves_like "a model method", :entity, :get_orgs  
+      
+      before(:each) do
+        @id = 1164
+        @options = {}
+      end
+      
+      it "should return an array of entities with Org as their primary type" do
+        @entities = @client.entity.get_orgs(@id, @options)
+        expect(@entities.collect.map(&:primary_type).uniq).to eq(["Org"])
+      end
+
+      pending "should return an array of entities connected by board or executive relationships" do
+        @entities = @client.entity.get_leadership(@id, @options)
+      end
+    end
+    
+    describe "#get_second_degree_entities" do
+      it_behaves_like "a model method", :entity, :get_second_degree_entities  
+
+      before(:each) do
+        @id = 1
+        @options = {}
+      end
+      
+      it "should return no more than 20 entities with degree1_ids" do
+        @entities = @client.entity.get_second_degree_entities(@id, @options)
+        expect(@entities.count).to be <= 20
+        expect(@entities.collect { |e| e.details[:degree1_ids] } & ["", nil]).to eq([])
+      end
+      
+      context "when given a limit" do
+        before(:each) do
+          @limit = 10
+          @options[:num] = @limit
+        end
+        
+        it "should return no more entities than the limit" do
+          @entities = @client.entity.get_second_degree_entities(@id, @options)
+          expect(@entities.count).to be <= @limit
+        end
+      end
+      
+      context "when given a page number" do
+        it "should return entities that aren't on other pages" do
+          @entities1 = @client.entity.get_second_degree_entities(@id, { :page => 1 })
+          @entities2 = @client.entity.get_second_degree_entities(@id, { :page => 2 })
+          expect(@entities1.map(&:id) & @entities2.map(&:id)).to eq([])
+        end
+      end
+      
+      pending "when given category id options" do      
+      end
+      
+      pending "when given order options" do      
+      end
+    end
   end
 end
