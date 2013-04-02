@@ -18,7 +18,7 @@ class LittlesisClient::Entity < LittlesisClient::Model
     "#{model_name.downcase}/#{id}#{path}.json"
   end
   
-  def self.details(id)
+  def self.get_with_details(id)
     new(get_hash(id, "/details"))
   end
 

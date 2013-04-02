@@ -1,6 +1,6 @@
 class LittlesisClient::Relationship < LittlesisClient::Model
   attr_accessor :id, :entity1_id, :entity2_id, :category_id,
-    :description1, :description2, :amount, :goods,
+    :description1, :description2, :amount, :goods, :notes,
     :start_date, :end_date, :is_current,
     :uri, :api_uri,
     :updated_at,
@@ -27,9 +27,17 @@ class LittlesisClient::Relationship < LittlesisClient::Model
       method = (k.to_s + "=").to_sym
       if respond_to? method
         send(method, self.class.symbolize_keys(v))
+      elsif k == "Entity1"
+        @entity1 = LittlesisClient::Entity.new(v)
+      elsif k == "Entity2"
+        @entity2 = LittlesisClient::Entity.new(v)
       else
         details[k.to_sym] = self.class.symbolize_keys(v)
       end
     end
-  end    
+  end
+  
+  def self.get_with_details(id)
+    new(get_hash(id, "/details"))
+  end  
 end

@@ -1,15 +1,5 @@
 require 'littlesis_client'
-
-shared_examples_for "a model method" do |model, method_name|
-  context "when given an invalid id" do      
-    it "should return an invalid request error" do
-      expect {
-        @entity = @client.send(model).send(method_name, "thisisnotanid")
-      }.to raise_error(LittlesisClient::InvalidRequestError)
-    end
-  end
-end
-
+require 'shared_examples'
 
 describe LittlesisClient::Entity do
   let(:api_key) { ENV["API_KEY"] }
@@ -19,7 +9,7 @@ describe LittlesisClient::Entity do
   end
 
   describe "#get" do
-    it_behaves_like "a model method", :entity, :get
+    it_behaves_like "a single resource method", :entity, :get
 
     context "when given a valid entity id" do
       before(:each) do
@@ -30,18 +20,18 @@ describe LittlesisClient::Entity do
         expect(@entity.class.name).to eq("LittlesisClient::Entity")
       end
       
-      it "should return a valid object" do
+      it "should return a valid entity" do
         expect(@entity.valid?).to eq(true)
       end
     end    
   end
   
-  describe "#details" do
-    it_behaves_like "a model method", :entity, :details
+  describe "#get_with_details" do
+    it_behaves_like "a single resource method", :entity, :get_with_details
 
     context "when given a valid entity id" do
       before(:each) do
-        @entity = @client.entity.details(1)
+        @entity = @client.entity.get_with_details(1)
       end
 
       it "should return an entity object" do
@@ -58,7 +48,7 @@ describe LittlesisClient::Entity do
 
       it "should return an entity with aliases" do
         expect(@entity.details[:Aliases].count).to be > 0
-      end      
+      end
     end
   end
   
@@ -105,7 +95,7 @@ describe LittlesisClient::Entity do
   end
 
   describe "#get_with_relationships" do
-    it_behaves_like "a model method", :entity, :get_with_relationships
+    it_behaves_like "a single resource method", :entity, :get_with_relationships
 
     context "when given a valid entity id" do
       before(:each) do
@@ -160,7 +150,7 @@ describe LittlesisClient::Entity do
   end
   
   describe "#get_related_entities" do
-    it_behaves_like "a model method", :entity, :get_related_entities  
+    it_behaves_like "a single resource method", :entity, :get_related_entities  
 
     context "when given a valid entity id" do
       before(:each) do
@@ -231,7 +221,7 @@ describe LittlesisClient::Entity do
     end
   
     describe "#get_related_entities_by_category" do
-      it_behaves_like "a model method", :entity, :get_related_entities_by_category  
+      it_behaves_like "a single resource method", :entity, :get_related_entities_by_category  
 
       before(:each) do
         @id = 1
@@ -249,7 +239,7 @@ describe LittlesisClient::Entity do
     end 
     
     describe "#get_leadership" do
-      it_behaves_like "a model method", :entity, :get_leadership  
+      it_behaves_like "a single resource method", :entity, :get_leadership  
       
       before(:each) do
         @id = 1
@@ -267,7 +257,7 @@ describe LittlesisClient::Entity do
     end
 
     describe "#get_orgs" do
-      it_behaves_like "a model method", :entity, :get_orgs  
+      it_behaves_like "a single resource method", :entity, :get_orgs  
       
       before(:each) do
         @id = 1164
@@ -285,7 +275,7 @@ describe LittlesisClient::Entity do
     end
     
     describe "#get_second_degree_entities" do
-      it_behaves_like "a model method", :entity, :get_second_degree_entities  
+      it_behaves_like "a single resource method", :entity, :get_second_degree_entities  
 
       before(:each) do
         @id = 1
