@@ -69,6 +69,11 @@ describe LittlesisClient::Entity do
         @entities = @client.entity.get_many(@ids, @details)
         expect(@entities.collect { |e| e.valid? }.uniq).to eq([true])      
       end
+
+      it "should return entities with the given ids" do
+        @entities = @client.entity.get_many(@ids, @details)
+        expect(@entities.map(&:id).map(&:to_i) - @ids).to eq([])            
+      end
       
       context "when given a details=true argument" do
         before(:each) do
@@ -312,6 +317,32 @@ describe LittlesisClient::Entity do
       end
       
       pending "when given order options" do      
+      end
+    end
+  end
+
+  describe "types" do
+    it "should return an array of types with ids 1 to 36" do
+      @types = @client.entity.types
+      expect(@types.collect { |t| t["id"].to_i }).to eq((1..36).to_a)
+    end
+
+    it "should return an array of types with names" do
+      @names = %w(Person Org PoliticalCandidate ElectedRepresentative Business GovernmentBody School MembershipOrg Philanthropy NonProfit PoliticalFundraising PrivateCompany PublicCompany IndustryTrade LawFirm LobbyingFirm PublicRelationsFirm IndividualCampaignCommittee Pac OtherCampaignCommittee MediaOrg ThinkTank Cultural SocialClub ProfessionalAssociation PoliticalParty LaborUnion Gse BusinessPerson Lobbyist Academic MediaPersonality ConsultingFirm PublicIntellectual PublicOfficial Lawyer)
+      @types = @client.entity.types
+      expect(@types.collect { |t| t["name"] }).to eq(@names)
+    end  
+  end
+  
+  describe "#type_names" do
+    context "when given an array of type ids" do
+      before(:each) do
+        @type_ids = [1, 4, 9, 16]
+        @names = %w(Person ElectedRepresentative Philanthropy LobbyingFirm)
+      end
+    
+      it "should return an array of names for those types" do
+        expect(@client.entity.type_names(@type_ids)).to eq(@names)
       end
     end
   end

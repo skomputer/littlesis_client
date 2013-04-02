@@ -17,6 +17,32 @@ class LittlesisClient::Relationship < LittlesisClient::Model
     "#{model_name.downcase}/#{id}#{path}.json"
   end
 
+  def self.categories
+    response = client.get("/relationships/categories.json")
+    response.body["Response"]["Data"]["RelationshipCategories"]["RelationshipCategory"]
+  end
+
+  def self.get_with_details(id)
+    new(get_hash(id, "/details"))
+  end
+
+  def self.get_many(ids, details=false)
+    url = "/batch/#{model_name.downcase.pluralize}.json"
+    params = { :ids => ids.join(',') }
+    params[:details] = 1 if details
+    response = client.get(url, params).body["Response"]["Data"][model_name.pluralize][model_name]
+    return [] if response.nil?    
+    response.collect { |data| new(data) }
+  end
+
+  def self.between_entities(entity1_id, entity2_id, cat_ids=[])
+    url = "/relationships/#{entity1_id};#{entity2_id}.json"
+    params = { :cat_ids => cat_ids.to_a.join(",") }
+    response = client.get(url, params).body["Response"]["Data"][model_name.pluralize][model_name]
+    return [] if response.nil?
+    response.collect { |data| new(data) }
+  end
+
   def initialize(data)
     @details = {}
     super(data)
@@ -36,8 +62,4 @@ class LittlesisClient::Relationship < LittlesisClient::Model
       end
     end
   end
-  
-  def self.get_with_details(id)
-    new(get_hash(id, "/details"))
-  end  
 end

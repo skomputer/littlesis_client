@@ -5,9 +5,8 @@ class LittlesisClient::Entity < LittlesisClient::Model
     :website, :uri, :api_uri,
     :updated_at,
     :details,
-    :relationships,
-    :related_entities
-
+    :relationships
+    
   validates_presence_of :id, :name, :primary_type, :uri, :api_uri
 
   def self.model_name
@@ -59,7 +58,7 @@ class LittlesisClient::Entity < LittlesisClient::Model
     return categories if cats.nil?
     cats.each do |hash|
       related = hash["RelatedEntities"]["Entity"]
-      categories[hash["id"].to_i] = related_entities = make_array(related) { |data| new(data) } unless related.nil?
+      categories[hash["id"].to_i] = make_array(related) { |data| new(data) } unless related.nil?
     end
     categories  
   end
@@ -84,11 +83,19 @@ class LittlesisClient::Entity < LittlesisClient::Model
     return [] if related.nil?
     make_array(related) { |data| new(data) }    
   end
+
+  def self.types
+    response = client.get("/entities/types.json")
+    response.body["Response"]["Data"]["EntityTypes"]["EntityType"]  
+  end
+  
+  def self.type_names(ids=[])
+    types.keep_if { |t| ids.to_a.empty? or ids.include? t["id"].to_i }.collect { |t| t["name"] }
+  end
       
   def initialize(data)
     @details = {}
     @relationships = []
-    @related_entities = []
     super(data)
   end
   
