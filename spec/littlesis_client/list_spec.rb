@@ -49,21 +49,6 @@ describe LittlesisClient::List do
         @list = @client.list.get_with_entities(23, @options)
         expect(@list.entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
       end
-
-      context "when given specific entity types" do
-        before(:each) do
-          @type_ids = [29]
-          @types = @client.entity.type_names(@type_ids)
-          @options = { :type_ids => @type_ids.join(","), :num => 20 }
-        end
-        
-        it "should only return entities with those types" do
-          @list = @client.list.get_with_entities(23, @options)
-          @entity_ids = @list.entities.map(&:id)
-          @entities = @client.entity.get_many(@entity_ids, true)
-          expect(@entities.collect { |e| e.details[:types] & @types }.uniq).to eq([@types])
-        end
-      end
     end
   end
 end

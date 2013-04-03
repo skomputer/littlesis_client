@@ -83,6 +83,35 @@ class LittlesisClient::Entity < LittlesisClient::Model
     return [] if related.nil?
     make_array(related) { |data| new(data) }    
   end
+  
+  def self.get_lists(id)
+    response = client.get(url(id, "/lists")).body["Response"]["Data"]
+    lists = response["Lists"]["List"]
+    return [] if lists.nil?
+    make_array(lists) { |data| LittlesisClient::List.new(data) }
+  end
+  
+  def self.get_images(id)
+    response = client.get(url(id, "/images")).body["Response"]["Data"]
+    images = response["Images"]["Image"]
+    return [] if images.nil?
+    make_array(images) { |data| LittlesisClient::Image.new(data) }  
+  end
+  
+  def self.search(query, options={})
+    options[:q] = query
+    response = client.get("/entities.json", options).body["Response"]["Data"]
+    entities = response["Entities"]["Entity"]
+    return [] if entities.nil?
+    make_array(entities) { |data| new(data) }
+  end
+  
+  def self.get_by_external_id(key, value)
+    response = client.get("/entities/#{key}/#{value}.json").body["Response"]["Data"]
+    entities = response["Entities"]["Entity"]
+    return [] if entities.nil?
+    make_array(entities) { |data| new(data) }
+  end
 
   def self.types
     response = client.get("/entities/types.json")

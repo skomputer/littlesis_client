@@ -47,7 +47,7 @@ class LittlesisClient
   end
 
   # create accessors for models
-  %w(Entity Relationship List).each do |model_name|
+  %w(Entity Relationship List Image).each do |model_name|
     
     # method name is snake case of model name
     method_name = model_name.underscore
@@ -87,3 +87,4 @@ require 'littlesis_client/model'
 require 'littlesis_client/entity'
 require 'littlesis_client/relationship'
 require 'littlesis_client/list'
+require 'littlesis_client/image'

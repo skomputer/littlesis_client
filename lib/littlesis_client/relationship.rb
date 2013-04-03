@@ -32,15 +32,16 @@ class LittlesisClient::Relationship < LittlesisClient::Model
     params[:details] = 1 if details
     response = client.get(url, params).body["Response"]["Data"][model_name.pluralize][model_name]
     return [] if response.nil?    
-    response.collect { |data| new(data) }
+    make_array(response).collect { |data| new(data) }
   end
 
   def self.between_entities(entity1_id, entity2_id, cat_ids=[])
     url = "/relationships/#{entity1_id};#{entity2_id}.json"
-    params = { :cat_ids => cat_ids.to_a.join(",") }
+    params = {}
+    params[:cat_ids] = cat_ids.to_a.join(",") unless cat_ids.to_a.empty?
     response = client.get(url, params).body["Response"]["Data"][model_name.pluralize][model_name]
     return [] if response.nil?
-    response.collect { |data| new(data) }
+    make_array(response).collect { |data| new(data) }
   end
 
   def initialize(data)

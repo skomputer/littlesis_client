@@ -3,7 +3,7 @@ class LittlesisClient::List < LittlesisClient::Model
     :updated_at, :uri, :api_uri,
     :entities
 
-  validates_presence_of :id, :name, :description, :is_ranked
+  validates_presence_of :id, :name, :is_ranked
   
   def self.model_name
     "List"
