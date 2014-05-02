@@ -10,7 +10,6 @@ Gem::Specification.new do |s|
   s.test_files            = Dir["spec/**spec.rb"]
   s.add_dependency        'activemodel', '>= 3.2.9'
   s.add_dependency        'activesupport', '>= 3.2.9'
-  s.add_dependency        'active_support/inflector', '>= 0.1.0'
   s.add_dependency        'faraday', '>= 0.8.4'
   s.add_dependency        'faraday_middleware', '>= 0.9.0'
   s.add_dependency        'logger', '>= 1.2.8'
