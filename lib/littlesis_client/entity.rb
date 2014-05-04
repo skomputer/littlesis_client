@@ -69,6 +69,13 @@ class LittlesisClient::Entity < LittlesisClient::Model
     return [] if related.nil?
     make_array(related) { |data| new(data) }
   end
+  
+  def self.get_leadership_degree2(id, options={})
+    response = client.get(url(id, "/leadership/degree2"), options).body["Response"]["Data"]
+    related = response["Leaders"]["Leader"]
+    return [] if related.nil?
+    make_array(related) { |data| new(data) }
+  end
 
   def self.get_orgs(id, options={})
     response = client.get(url(id, "/orgs"), options).body["Response"]["Data"]
