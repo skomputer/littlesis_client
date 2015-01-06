@@ -226,6 +226,22 @@ describe LittlesisClient::Entity do
     end
   end
 
+  describe "#get_relationships_with_related_entities" do
+    it_behaves_like "a single resource method", :entity, :get_related_entities_by_category  
+
+    before(:each) do
+      @id = 1
+      @options = {}
+    end
+    
+    it "should return an array of relationships with related entities" do
+      @relationships = @client.entity.get_relationships_with_related_entities(@id, @options)
+      expect(@relationships.map do |rel| 
+        (rel.entity1_id == @id.to_s and rel.entity2_id == rel.entity2.id) or (rel.entity2_id == @id.to_s and rel.entity1_id == rel.entity1.id)
+      end.uniq).to eq([true])
+    end
+  end 
+
   describe "#get_related_entities_by_category" do
     it_behaves_like "a single resource method", :entity, :get_related_entities_by_category  
 

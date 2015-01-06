@@ -40,7 +40,7 @@ class LittlesisClient::Entity < LittlesisClient::Model
     end unless rels.nil?
     entity  
   end
-  
+
   # valid options keys are :category_ids, :num, :page, :is_current, :order
   def self.get_related_entities(id, options={})
     response = client.get(url(id, "/related"), options).body["Response"]["Data"]
@@ -48,6 +48,23 @@ class LittlesisClient::Entity < LittlesisClient::Model
     related = response["RelatedEntities"]["Entity"]
     return [] if related.nil?
     make_array(related) { |data| new(data) }
+  end
+
+  def self.get_relationships_with_related_entities(id, options={})
+    options[:sort] = "relationship"
+    response = client.get(url(id, "/related"), options).body["Response"]["Data"]
+    rels = response["Relationships"]["Relationship"]
+    return [] if rels.nil?
+    rels = make_array(rels) do |data|
+      r = LittlesisClient::Relationship.new(data)
+      e = new(data['RelatedEntity'])
+      if e.id == r.entity1_id
+        r.entity1 = e
+      else
+        r.entity2 = e
+      end
+      r
+    end
   end
   
   def self.get_related_entities_by_category(id, options={})
