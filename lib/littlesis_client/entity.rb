@@ -154,7 +154,6 @@ class LittlesisClient::Entity < LittlesisClient::Model
   
   def set_data(data)
     data.each do |k, v|
-      v = nil if v == ""
       method = (k.to_s + "=").to_sym
       if respond_to? method
         send(method, self.class.symbolize_keys(v))
