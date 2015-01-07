@@ -31,9 +31,9 @@ class LittlesisClient::Model
 
   def set_data(data)
     data.each do |k, v|
+      v = nil if v == ""
       method = (k.to_s + "=").to_sym
       if respond_to? method
-        v = nil if v == ""
         send(method, self.class.symbolize_keys(v))
       else
         instance_variable_set("@#{k}".to_sym, self.class.symbolize_keys(v))
