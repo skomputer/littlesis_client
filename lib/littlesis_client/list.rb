@@ -23,7 +23,11 @@ class LittlesisClient::List < LittlesisClient::Model
     list    
   end
 
+  def self.get_entity_ids(id, options={})
+    client.get(url(id, "/entity-ids"), options).body
+  end
+
   def self.get_network_links(id, options={})
-    response = client.get(url(id, "/network-links"), options).body
+    client.get(url(id, "/network-links"), options).body
   end
 end

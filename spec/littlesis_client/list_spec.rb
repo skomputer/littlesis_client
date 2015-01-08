@@ -52,6 +52,20 @@ describe LittlesisClient::List do
     end
   end
 
+  describe "#get_entity_ids" do
+    it_behaves_like "a single resource method", :list, :get_entity_ids
+
+    context "when given a valid list id" do    
+      it "should return an array of entity ids belonging to the list" do
+        list = @client.list.get_with_entities(23, { num: 1000 })
+        entity_ids = list.entities.map(&:id).map(&:to_i)
+        results = @client.list.get_entity_ids(23)
+        expect(entity_ids - results).to eq([])
+        expect(results - entity_ids).to eq([])
+      end
+    end
+  end
+
   describe "#get_network_links" do
     it_behaves_like "a single resource method", :list, :get_network_links
 
