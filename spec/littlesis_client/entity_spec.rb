@@ -449,6 +449,32 @@ describe LittlesisClient::Entity do
       end
     end      
   end
+
+  describe "#get_featured_image_url" do
+    it_behaves_like "a single resource method", :entity, :get_featured_image_url
+    
+    context "when given a valid entity id with a featured image" do
+      before(:each) do
+        @id = 14597
+        @url = @client.entity.get_featured_image_url(@id)
+      end
+
+      it "should return a featured image_url" do
+        expect(@url).to match(/images\/profile/)
+      end
+    end
+
+    context "when given a valid person id without a featured image" do
+      before(:each) do
+        @id = 171446
+        @url = @client.entity.get_featured_image_url(@id)
+      end
+
+      it "should return a default person image" do
+        expect(@url).to eq(LittlesisClient::Image::DEFAULT_IMAGE_PATH + "anon.png")
+      end
+    end
+  end
   
   describe "#search" do
     context "when given a query" do

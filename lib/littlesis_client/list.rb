@@ -22,4 +22,8 @@ class LittlesisClient::List < LittlesisClient::Model
     end unless entities.nil?
     list    
   end
+
+  def self.get_network_links(id, options={})
+    response = client.get(url(id, "/network-links"), options).body
+  end
 end

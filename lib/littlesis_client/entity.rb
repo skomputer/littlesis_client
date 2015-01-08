@@ -122,6 +122,17 @@ class LittlesisClient::Entity < LittlesisClient::Model
     make_array(images) { |data| LittlesisClient::Image.new(data) }  
   end
   
+  def self.get_featured_image_url(id)
+    images = get_images(id)
+    if images.count > 0
+      images.find { |i| i.is_featured = '1' }.uri
+    else
+      entity = get(id)
+      filename = entity.primary_type == "Person" ? "anon.png" : "anons.png"
+      LittlesisClient::Image::DEFAULT_IMAGE_PATH + filename
+    end
+  end
+
   def self.search(query, options={})
     options[:q] = query
     response = client.get("/entities.json", options).body["Response"]["Data"]

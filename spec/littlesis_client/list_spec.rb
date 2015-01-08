@@ -51,4 +51,17 @@ describe LittlesisClient::List do
       end
     end
   end
+
+  describe "#get_network_links" do
+    it_behaves_like "a single resource method", :list, :get_network_links
+
+    it "should return an array of connections between entities in the list and related entities" do
+      list = @client.list.get_with_entities(23, { num: 500 })
+      entity_ids = list.entities.map(&:id).map(&:to_i)
+      links = @client.list.get_network_links(23)
+      expect(links.map do |l|
+        val = entity_ids.include?(l[1]) and @client.relationship.between_entities(l[1], l[2], [l[3]]).count > 0
+      end.uniq).to eq([true])
+    end
+  end
 end
