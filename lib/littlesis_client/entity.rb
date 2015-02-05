@@ -58,7 +58,9 @@ class LittlesisClient::Entity < LittlesisClient::Model
     rels = make_array(rels) do |data|
       r = LittlesisClient::Relationship.new(data)
       e = new(data['RelatedEntity'])
-      if e.id == r.entity1_id
+      if e.id == r.entity1_id and e.id == r.entity2_id
+        r.entity1 = r.entity2 = e
+      elsif e.id == r.entity1_id
         r.entity1 = e
       else
         r.entity2 = e
