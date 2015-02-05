@@ -20,7 +20,7 @@ class LittlesisClient::List < LittlesisClient::Model
     list.entities = make_array(entities) do |data| 
       LittlesisClient::Entity.new(data)
     end unless entities.nil?
-    list    
+    list
   end
 
   def self.get_entity_ids(id, options={})

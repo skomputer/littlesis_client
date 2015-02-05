@@ -133,6 +133,10 @@ class LittlesisClient::Entity < LittlesisClient::Model
     end
   end
 
+  def self.get_political(id, options={})
+    client.get(url(id, "/political")).body
+  end
+
   def self.search(query, options={})
     options[:q] = query
     response = client.get("/entities.json", options).body["Response"]["Data"]

@@ -5,7 +5,7 @@ describe LittlesisClient::Entity do
   let(:api_key) { ENV["API_KEY"] }
 
   before(:each) do
-    @client = LittlesisClient.new(api_key, "api.littlesis.org")
+    @client = LittlesisClient.new(api_key, (ENV['API_HOST'] or "api.littlesis.org"))
   end
 
   describe "#get" do
@@ -472,6 +472,36 @@ describe LittlesisClient::Entity do
 
       it "should return a default person image" do
         expect(@url).to eq(LittlesisClient::Image::DEFAULT_IMAGE_PATH + "anon.png")
+      end
+    end
+  end
+
+  describe "#get_political" do
+    it_behaves_like "a single resource method", :entity, :get_political
+
+    context "when given a valid entity id with political contributions" do
+      before(:each) do
+        @id = 1164
+        @data = @client.entity.get_political(@id)
+      end
+
+      it "should return person and org recipients" do
+        expect(@data['person_recipients'].count).to be > 0
+        expect(@data['org_recipients'].count).to be > 0
+      end
+
+      it "should return a donor matching the entity" do
+        expect(@data['donors'].keys).to eq([@id.to_s])
+      end
+
+      it "should return consistent democratic, republican, and other party totals" do
+        all_recipients = @data['person_recipients'].values.concat(@data['org_recipients'].values)
+        dem_total = all_recipients.select { |r| r['party'] == 'D' }.map { |r| r['amount'] }.inject(0, :+)
+        rep_total = all_recipients.select { |r| r['party'] == 'R' }.map { |r| r['amount'] }.inject(0, :+)
+        other_total = all_recipients.select { |r| !['R', 'D'].include?(r['party']) }.map { |r| r['amount'] }.inject(0, :+)
+        expect(@data['dem_total']).to eq(dem_total)
+        expect(@data['rep_total']).to eq(rep_total)
+        expect(@data['other_total']).to eq(other_total)
       end
     end
   end
