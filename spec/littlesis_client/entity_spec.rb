@@ -506,6 +506,23 @@ describe LittlesisClient::Entity do
     end
   end
   
+  describe "#get_articles" do
+    it_behaves_like "a single resource method", :entity, :get_articles
+
+    context "when given a valid entity id with articles" do
+      before(:each) do
+        @id = 1164
+        @data = @client.entity.get_articles(@id)
+      end
+
+      it "should return articles with titles and urls" do 
+        expect(@data.count).to be > 0
+        expect(@data.count { |a| a['title'].present? }).to eq(@data.count)
+        expect(@data.count { |a| a['url'].present? }).to eq(@data.count)
+      end
+    end
+  end
+
   describe "#search" do
     context "when given a query" do
       before(:each) do
