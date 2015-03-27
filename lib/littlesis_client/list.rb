@@ -30,4 +30,8 @@ class LittlesisClient::List < LittlesisClient::Model
   def self.get_network_links(id, options={})
     client.get(url(id, "/network-links"), options).body
   end
+
+  def self.get_images(id, options={})
+    client.get(url(id, "/images"), options).body
+  end
 end

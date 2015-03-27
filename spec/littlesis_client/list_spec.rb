@@ -5,7 +5,7 @@ describe LittlesisClient::List do
   let(:api_key) { ENV["API_KEY"] }
 
   before(:each) do
-    @client = LittlesisClient.new(api_key, "api.littlesis.org")
+    @client = LittlesisClient.new(api_key, (ENV['API_HOST'] or "api.littlesis.org"))
   end
 
   describe "#get" do
@@ -76,6 +76,15 @@ describe LittlesisClient::List do
       expect(links.map do |l|
         val = entity_ids.include?(l[1]) and @client.relationship.between_entities(l[1], l[2], [l[3]]).count > 0
       end.uniq).to eq([true])
+    end
+  end
+
+  describe "#get_images" do
+    it_behaves_like "a single resource method", :list, :get_images
+
+    it "should return an array of hashes with entity ids and urls" do
+      data = @client.list.get_images(23)
+      expect(data.map { |h| !!h['id'] and !!h['url'] }.uniq).to eq([true])
     end
   end
 end
