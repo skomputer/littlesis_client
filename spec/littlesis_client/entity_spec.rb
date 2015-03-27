@@ -523,6 +523,23 @@ describe LittlesisClient::Entity do
     end
   end
 
+  describe "#get_addresses" do
+    it_behaves_like "a single resource method", :entity, :get_addresses
+
+    context "when given a valid entity id with addresses" do
+      before(:each) do
+        @id = 1164
+        @data = @client.entity.get_addresses(@id)
+      end
+
+      it "should return addresses with city and country name" do 
+        expect(@data.count).to be > 0
+        expect(@data.count { |a| a['city'].present? }).to eq(@data.count)
+        expect(@data.count { |a| a['country_name'].present? }).to eq(@data.count)
+      end
+    end
+  end
+
   describe "#search" do
     context "when given a query" do
       before(:each) do
