@@ -34,4 +34,8 @@ class LittlesisClient::List < LittlesisClient::Model
   def self.get_images(id, options={})
     client.get(url(id, "/images"), options).body
   end
+
+  def self.get_search_data(id, options={})
+    client.get(url(id, "/search-data"), options).body
+  end
 end

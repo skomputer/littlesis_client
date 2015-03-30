@@ -87,4 +87,14 @@ describe LittlesisClient::List do
       expect(data.map { |h| !!h['id'] and !!h['url'] }.uniq).to eq([true])
     end
   end
+
+  describe "#get_search_data" do
+    it_behaves_like "a single resource method", :list, :get_search_data
+
+    it "should return an array of hashes with entity ids, names, aliaes, and urls" do
+      data = @client.list.get_search_data(23)
+      expect(data.map { |h| !!h['id'] and !!h['url'] and !!h['name'] }.uniq).to eq([true])
+      expect(data.map { |h| h['aliases'].count > 0 }.uniq).to eq([true])
+    end
+  end
 end
