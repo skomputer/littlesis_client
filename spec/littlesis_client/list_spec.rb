@@ -88,6 +88,15 @@ describe LittlesisClient::List do
     end
   end
 
+  describe "#get_articles" do
+    it_behaves_like "a single resource method", :list, :get_articles
+
+    it "should return an array of hashes with entity ids, article ids, and urls" do
+      data = @client.list.get_articles(786)
+      expect(data.map { |h| !!h['entity_id'] and !!h['url'] and !!['article_id'] }.uniq).to eq([true])
+    end
+  end
+
   describe "#get_search_data" do
     it_behaves_like "a single resource method", :list, :get_search_data
 
