@@ -1,7 +1,7 @@
 class LittlesisClient::Image < LittlesisClient::Model
   include ActiveModel::Validations        
 
-  attr_accessor :id, :title, :caption, :is_featured, :uri, :source
+  attr_accessor :id, :title, :caption, :is_featured, :uri, :source, :address_id
 
   validates_presence_of :id, :title, :is_featured, :uri, :source    
 
