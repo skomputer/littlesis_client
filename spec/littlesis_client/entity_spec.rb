@@ -96,7 +96,24 @@ describe LittlesisClient::Entity do
           expect(@entities).to eq([])        
         end
       end
-    end      
+    end    
+
+    context "when given one entity id" do
+      before(:each) do
+        @ids = [1]
+        @details = false
+        @entities = @client.entity.get_many(@ids, @details)
+      end
+      
+      it "should return one entity" do
+        expect(@entities.count).to eq 1
+        expect(@entities.collect { |e| e.class.name }.uniq).to eq(["LittlesisClient::Entity"])
+      end
+      
+      it "should return one valid entity" do
+        expect(@entities.collect { |e| e.valid? }.uniq).to eq([true])      
+      end
+    end
   end
 
   describe "#get_with_relationships" do

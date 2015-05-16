@@ -26,7 +26,8 @@ class LittlesisClient::Entity < LittlesisClient::Model
     params = { :ids => ids.join(',') }
     params[:details] = 1 if details
     response = client.get(url, params).body["Response"]["Data"][model_name.pluralize][model_name]
-    return [] if response.nil?    
+    return [] if response.nil?
+    response = [response] unless response.is_a? Array
     response.collect { |data| new(data) }
   end
 
